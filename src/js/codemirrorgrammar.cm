@@ -1,0 +1,10 @@
+Statement {
+  label ":" |
+  variable
+}
+
+label="meta" { letter+ ~(spaceChar* ":") }
+variable="variable" { letter+ }
+
+letter { "a"-"z" | "A"-"Z" }
+spaceChar { " " }

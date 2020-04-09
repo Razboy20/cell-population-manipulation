@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>[TEMP] Cell Population Manipulation</title>
+    <link rel="stylesheet" href="src/css/main.css">
+    <link rel="stylesheet" href="src/css/lib/codemirror.css">
+    <link rel="stylesheet" href="src/css/lib/neotheme.css">
+    <script src="src/js/lib/nearley.js"></script>
+    <!-- <script src="src/js/assets/jquery.js"></script>
+    <script src="src/js/assets/jcanvas.js"></script>
+    <script src="src/js/assets/codemirror.js"></script>
+    <script src="src/js/grammar.js"></script> -->
+    <script type="module" src="src/js/main2.js"></script>
+
+</head>
+
+<body>
+    <section class="grid">
+        <div class="input">
+
+            <textarea name="rules" id="rules" cols="30" rows="50" style="display: none;">main(X);
+a1 = leader_elect(X);
+a2 = leader_elect(X);
+line1 = select(X, a1 == a2);
+b1 = leader_elect(line1);
+b2 = leader_elect(line1);
+line2 = select(X, b1 == b2);
+
+center = leader_elect(line1 intersect line2);
+circle = select(X, center == 40);
+
+p1 = leader_elect(circle intersect line1);
+p2 = leader_elect(circle intersect line1);
+p3 = leader_elect(circle intersect line2);
+p4 = leader_elect(circle intersect line2);
+</textarea><br>
+            <button id="parseButton" type="submit">Repopulate</button><br>
+
+        </div>
+        <div class="output">
+            <canvas id="cellBoard" height="1000px" width="1000px"></canvas>
+        </div>
+    </section>
+
+    <script>
+        var PIXEL_RATIO = (function () {
+            var ctx = document.createElement("canvas").getContext("2d"),
+                dpr = window.devicePixelRatio || 1,
+                bsr =
+                    ctx.webkitBackingStorePixelRatio ||
+                    ctx.mozBackingStorePixelRatio ||
+                    ctx.msBackingStorePixelRatio ||
+                    ctx.oBackingStorePixelRatio ||
+                    ctx.backingStorePixelRatio ||
+                    1;
+
+            return dpr / bsr;
+        })();
+
+        changeCanvasRatio = function () {
+            const ratio = PIXEL_RATIO;
+            const can = document.getElementsByTagName("canvas")[0];
+            can.style.width = can.width + "px";
+            can.style.height = can.height + "px";
+            can.width = can.width * ratio;
+            can.height = can.height * ratio;
+            can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+            return can;
+        };
+
+        //Create canvas with the device resolution.
+        changeCanvasRatio();
+    </script>
+</body>
+
+</html>
