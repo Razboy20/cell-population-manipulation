@@ -7,20 +7,6 @@ import './lib/simplemodeaddon.js';
 let vars;
 let cells;
 
-function getVar(varName) {
-	// console.log(cells);
-	const _temp = [];
-	let output = vars.get(varName);
-	// console.log(output, 'output');
-	if (output.cells)
-		output.cells = output.cells.map((cell) => {
-			return cells[cell.pos.x][cell.pos.y];
-		});
-	if (output.cell) output.cell = cells.flat().find((_cell) => _cell === output.cell);
-
-	return output;
-}
-
 function lexer(parse) {
 	parse = parse[0];
 	if (!parse) parse = [];
@@ -38,7 +24,7 @@ function lexer(parse) {
 					console.error('You cannot re-create the main board twice!');
 					break;
 				}
-				boardSize = line.size == 'default' ? { x: 150, y: 150 } : line.size;
+				boardSize = line.size === 'default' ? { x: 150, y: 150 } : line.size;
 				//console.log(boardSize);
 				const _cells = [];
 				for (let i = 0; i < boardSize.x; i++) {
@@ -64,7 +50,7 @@ function lexer(parse) {
 						break;
 					}*/
 				//const cell = cellGroup[Math.floor(Math.random() * boardSize.x)][Math.floor(Math.random() * boardSize.y)];
-				if (cellGroup.length == 0) {
+				if (cellGroup.length === 0) {
 					console.error(
 						'Cell Population calling leader_election is empty! (Might be a one time thing, or if it is recurring, double check your work.)'
 					);
@@ -95,7 +81,7 @@ function lexer(parse) {
 				if (!selectGroup) {
 					console.error('Group variable does not exist.');
 					break;
-				} else if (selectGroup.class != 'group') {
+				} else if (selectGroup.class !== 'group') {
 					console.error('Variable is not of type group.');
 					break;
 				}
@@ -128,10 +114,10 @@ function lexer(parse) {
 }
 
 function conditions(conds, cell) {
-	if (!vars.has(conds.left) && isNaN(conds.left)) {
+	if (!vars.has(conds.left) && isNaN(conds.left) && typeof conds.left != 'object') {
 		console.error(conds.left + ' -- Left leader cell does not exist.');
 		return null;
-	} else if (!vars.has(conds.right) && isNaN(conds.right)) {
+	} else if (!vars.has(conds.right) && isNaN(conds.right) && typeof conds.left != 'object') {
 		console.error(conds.right + ' -- Right leader cell does not exist.');
 		return null;
 	}
@@ -139,7 +125,7 @@ function conditions(conds, cell) {
 		case '==':
 			return (
 				Math.abs(dist(conds.left, cell) - dist(conds.right, cell)) <=
-				Math.sqrt(dist(conds.left, conds.right, true)) * 0.9
+				Math.sqrt(dist(conds.left, conds.right, true)) * 1.1
 			);
 		case '>':
 			return dist(conds.left, cell) > dist(conds.right, cell);
@@ -159,7 +145,7 @@ function conditions(conds, cell) {
 }
 
 /**
- * Returns cells that satisfy the conditions 
+ * Returns cells that satisfy the conditions
  * @param {Object} ops Set operations to be used on groups.
  */
 function setoperations(ops) {
@@ -170,7 +156,7 @@ function setoperations(ops) {
 			console.error('Group variable does not exist.');
 			console.log(ops);
 			return [];
-		} else if (group.class != 'group') {
+		} else if (group.class !== 'group') {
 			console.error('Variable is not of type group.');
 			return [];
 		}
@@ -184,7 +170,7 @@ function setoperations(ops) {
 		if (!lvar) {
 			console.error('Left group variable does not exist.');
 			return [];
-		} else if (lvar.class != 'group') {
+		} else if (lvar.class !== 'group') {
 			console.error('Variable is not of type group.');
 			return [];
 		}
@@ -199,7 +185,7 @@ function setoperations(ops) {
 		if (!rvar) {
 			console.error('Right group variable does not exist.');
 			return [];
-		} else if (rvar.class != 'group') {
+		} else if (rvar.class !== 'group') {
 			console.error('Variable is not of type group.');
 			return [];
 		}
@@ -224,6 +210,7 @@ function setoperations(ops) {
  * Get distance from leader cell to iterated cell.
  * @param {string} getLeaderCell Variable name of the leader.
  * @param {Object} iteratedCell An iterated cell.
+ * @param isLCell
  */
 function dist(getLeaderCell, iteratedCell, isLCell = false) {
 	if (!isNaN(iteratedCell)) return parseInt(iteratedCell ** 2);
@@ -276,7 +263,6 @@ CodeMirror.defineSimpleMode('formatrules', {
 			next: 'setops'
 		},
 		{
-			// I'm in my codewizards class :joy: I'll join you later
 			regex: /(?<=\()(\w+)(?=\))/,
 			token: [ null, 'variable', null, null ]
 		},
@@ -290,8 +276,8 @@ CodeMirror.defineSimpleMode('formatrules', {
 
 		{ regex: /[=]+/, token: 'operator' },
 		// indent and dedent properties guide autoindentation
-		{ regex: /[\{\[\(]/, indent: true },
-		{ regex: /[\}\]\)]/, dedent: true },
+		{ regex: /[{\[(]/, indent: true },
+		{ regex: /[}\])]/, dedent: true },
 		{ regex: /[a-z$][\w$]*/, token: 'variable' }
 	],
 	setops: [

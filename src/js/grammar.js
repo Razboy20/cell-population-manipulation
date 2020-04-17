@@ -118,7 +118,7 @@ var grammar = {
     {"name": "line", "symbols": ["_", "var", "_", {"literal":"="}, "_", "function", "_", "line$ebnf$2", "_"], "postprocess": function(d) {return {setvar: d[1], ...d[5]}}},
     {"name": "line$ebnf$3", "symbols": [{"literal":";"}], "postprocess": id},
     {"name": "line$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "line", "symbols": ["_", "var", "_", {"literal":"="}, "_", "setp", "_", "line$ebnf$3", "_"], "postprocess": function(d) {return {type: "f-set_operation", ops: d[5]}}},
+    {"name": "line", "symbols": ["_", "var", "_", {"literal":"="}, "_", "setp", "_", "line$ebnf$3", "_"], "postprocess": function(d) {return {type: "f-set_operation", setvar: d[1], ops: d[5]}}},
     {"name": "statement$subexpression$1", "symbols": [/[mM]/, /[aA]/, /[iI]/, /[nN]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "statement$ebnf$1$subexpression$1", "symbols": [{"literal":","}, "_", "int", "_", {"literal":","}, "_", "int", "_"]},
     {"name": "statement$ebnf$1", "symbols": ["statement$ebnf$1$subexpression$1"], "postprocess": id},

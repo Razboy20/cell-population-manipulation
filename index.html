@@ -20,7 +20,7 @@
     <section class="grid">
         <div class="input">
 
-            <textarea name="rules" id="rules" cols="30" rows="50" style="display: none;">main(X);
+            <label for="rules"></label><textarea name="rules" id="rules" cols="30" rows="50" style="display: none;">main(X);
 a1 = leader_elect(X);
 a2 = leader_elect(X);
 line1 = select(X, a1 == a2);
@@ -35,6 +35,8 @@ p1 = leader_elect(circle intersect line1);
 p2 = leader_elect(circle intersect line1);
 p3 = leader_elect(circle intersect line2);
 p4 = leader_elect(circle intersect line2);
+
+square = select(X, p1 > center and p2 > center and p3 > center and p4 > center);
 </textarea><br>
             <button id="parseButton" type="submit">Repopulate</button><br>
 
