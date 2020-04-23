@@ -14,6 +14,12 @@
 .cm-s-neo .cm-comment {
 	color: #75787b;
 }
+.cm-s-neo .cm-hexcode1 {
+	color: #72310b;
+}
+.cm-s-neo .cm-hexcode2 {
+	color: #b8641b;
+}
 .cm-s-neo .cm-keyword,
 .cm-s-neo .cm-property {
 	color: #155f94;

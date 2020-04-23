@@ -19,7 +19,6 @@
 <body>
     <section class="grid">
         <div class="input">
-
             <label for="rules"></label><textarea name="rules" id="rules" cols="30" rows="50" style="display: none;">main(X);
 a1 = leader_elect(X);
 a2 = leader_elect(X);
@@ -38,7 +37,8 @@ p4 = leader_elect(circle intersect line2);
 
 square = select(X, p1 > center and p2 > center and p3 > center and p4 > center);
 </textarea><br>
-            <button id="parseButton" type="submit">Repopulate</button><br>
+            <button id="parseButton" type="submit">REPOPULATE</button><br>
+            <div class="seed"><span></span><input type="text" name="seed" id="seed"><input type="checkbox" name="randomize" id="randomize" value="Randomize" checked><label for="randomize">Randomize</label><button id="saveRules">SAVE</button></div>
 
         </div>
         <div class="output">

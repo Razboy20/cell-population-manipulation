@@ -1,5 +1,7 @@
+@import url("fonts/Roboto/Roboto-Regular.ttf");
 body {
   margin: unset;
+  font-family: 'Roboto', sans-serif;
 }
 
 .grid {
@@ -19,11 +21,60 @@ body {
   max-width: 90%;
 }
 
-.grid .input button {
+.grid .input .seed {
   display: block;
   margin: auto;
-  width: 100px;
+  margin-top: 17px;
+  position: relative;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.grid .input label {
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.grid .input #parseButton {
+  margin: auto;
+  margin-top: 15px;
+  display: block;
+  border-radius: 5px;
+  background: #56b33f;
+  color: #fff;
+  -webkit-box-shadow: 0 6px #3f8b2c;
+          box-shadow: 0 6px #3f8b2c;
+  -webkit-transition: none;
+  transition: none;
+  border: none;
+  font-family: inherit;
   font-size: 14px;
+  cursor: pointer;
+  padding: 12px 15px;
+  width: 90%;
+  letter-spacing: 1px;
+  font-weight: 600;
+  outline: none;
+  position: relative;
+}
+
+.grid .input #parseButton:hover {
+  -webkit-box-shadow: 0 4px #3f8b2c;
+          box-shadow: 0 4px #3f8b2c;
+  top: 2px;
+}
+
+.grid .input #parseButton:active {
+  -webkit-box-shadow: 0 0 #3f8b2c;
+          box-shadow: 0 0 #3f8b2c;
+  top: 6px;
+}
+
+.grid .input #parseButton:disabled {
+  background: #a3b39f;
+  -webkit-box-shadow: 0 6px #7e8b7a;
+          box-shadow: 0 6px #7e8b7a;
 }
 
 .grid .output {

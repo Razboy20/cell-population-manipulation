@@ -3,11 +3,28 @@ import './lib/jquery.js';
 import './lib/jcanvas.js';
 import './lib/codemirror.js';
 import './lib/simplemodeaddon.js';
+import './lib/seedrandom.js';
 
 let vars;
 let cells;
+let seed = 'Yet to be created...';
+$('#seed').attr('placeholder', seed);
+
+const loadSearchParams = new URLSearchParams(window.location.search);
+if (loadSearchParams.has('rules') && loadSearchParams.has('seed')) {
+	$('#rules').val(loadSearchParams.get('rules'));
+	$('#seed').val(loadSearchParams.get('seed'));
+	$('#randomize')[0].checked = false;
+} else {
+	window.history.replaceState(null, null, window.location.origin + window.location.pathname);
+}
 
 function lexer(parse) {
+	seed = !$('#randomize').is(':checked')
+		? $('#seed').val()
+		: ('000000000000' + Math.floor(Math.random() * 999999999999)).substr(-12, 12);
+	$('#seed').val(seed);
+	Math.seedrandom(seed);
 	parse = parse[0];
 	if (!parse) parse = [];
 	vars = new Map();
@@ -73,7 +90,7 @@ function lexer(parse) {
 				// cell = cells[i1][i2];
 				if (!cell) break;
 				cell.type = 'leader';
-				cell.color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+				cell.color = '#' + Math.random().toString(16).slice(2, 8);
 				vars.set(line.setvar, { type: 'leader', class: 'cell', cell: [ cell.pos.x, cell.pos.y ] });
 				break;
 			case 'f-select':
@@ -89,7 +106,7 @@ function lexer(parse) {
 				selectGroup.cells.forEach((cell) => {
 					if (conditions(line.conds, cell)) _temp.push(cell);
 				});
-				const _color1 = '#' + Math.floor(Math.random() * 16777215).toString(16);
+				const _color1 = '#' + Math.random().toString(16).slice(2, 8);
 				_temp.forEach(([ i1, i2 ]) => {
 					const cell = cells[i1][i2];
 					if (!cell.type) cell.color = _color1;
@@ -99,7 +116,7 @@ function lexer(parse) {
 				break;
 			case 'f-set_operation':
 				const _scells = setoperations(line.ops);
-				const _color2 = '#' + Math.floor(Math.random() * 16777215).toString(16);
+				const _color2 = '#' + Math.random().toString(16).slice(2, 8);
 				_scells.forEach(([ i1, i2 ]) => {
 					const cell = cells[i1][i2];
 					if (!cell.type) cell.color = _color2;
@@ -232,27 +249,44 @@ function dist(getLeaderCell, iteratedCell, isLCell = false) {
 }
 
 function render({ boardSize, cells }) {
-	$('#cellBoard').clearCanvas();
+	// $('#cellBoard').clearCanvas();
+	// const ratio = boardSize.x > boardSize.y ? 1000 / boardSize.x : 1000 / boardSize.y;
+	// cells.forEach((group) => {
+	// 	group.forEach((cell) => {
+	// 		if (!cell.color) return;
+	// 		let cellDrawObject = {
+	// 			fillStyle: cell.color,
+	// 			x: cell.pos.x * ratio,
+	// 			y: cell.pos.y * ratio,
+	// 			width: ratio,
+	// 			height: ratio,
+	// 			fromCenter: false
+	// 		};
+
+	// 		$('#cellBoard').drawEllipse(cellDrawObject);
+	// 	});
+	// });
+	const canvas = document.getElementById('cellBoard');
+	const ctx = canvas.getContext('2d');
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	const ratio = boardSize.x > boardSize.y ? 1000 / boardSize.x : 1000 / boardSize.y;
+
 	cells.forEach((group) => {
 		group.forEach((cell) => {
 			if (!cell.color) return;
-			let cellDrawObject = {
-				fillStyle: cell.color,
-				x: cell.pos.x * ratio,
-				y: cell.pos.y * ratio,
-				width: ratio,
-				height: ratio,
-				fromCenter: false
-			};
-
-			$('#cellBoard').drawEllipse(cellDrawObject);
+			ctx.fillStyle = cell.color;
+			console.log(cell.color, ctx.fillStyle);
+			ctx.beginPath();
+			ctx.arc(cell.pos.x * ratio + ratio / 2, cell.pos.y * ratio + ratio / 2, ratio / 2, 0, 2 * Math.PI);
+			ctx.fill();
 		});
 	});
 }
 
 CodeMirror.defineSimpleMode('formatrules', {
 	start: [
+		{ regex: /\/\/.*/, token: 'comment' },
+		{ regex: /(#)([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})\s+/, token: [ 'hexcode1', 'hexcode2' ] },
 		{
 			regex: /(?:intersect|union|difference|and|or|not|==)\b/,
 			token: 'atom'
@@ -278,7 +312,7 @@ CodeMirror.defineSimpleMode('formatrules', {
 		// indent and dedent properties guide autoindentation
 		{ regex: /[{\[(]/, indent: true },
 		{ regex: /[}\])]/, dedent: true },
-		{ regex: /[a-z$][\w$]*/, token: 'variable' }
+		{ regex: /[a-z$A-Z][\w$]*/, token: 'variable' }
 	],
 	setops: [
 		{ regex: /\)/, next: 'start' },
@@ -338,3 +372,18 @@ function parseTextArea() {
 }
 
 $('#parseButton').on('click', parseTextArea);
+
+function saveRules() {
+	if (!document.getElementById('seed').value) return;
+	document.getElementById('seed').value = seed;
+	const searchParams = new URLSearchParams();
+	searchParams.set('rules', rulesEditor.getValue());
+	searchParams.set('seed', seed);
+	window.history.replaceState(
+		null,
+		null,
+		window.location.origin + window.location.pathname + '?' + searchParams.toString()
+	);
+}
+
+$('#saveRules').on('click', saveRules);
