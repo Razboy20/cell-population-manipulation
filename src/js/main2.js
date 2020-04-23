@@ -15,6 +15,7 @@ if (loadSearchParams.has('rules') && loadSearchParams.has('seed')) {
 	$('#rules').val(loadSearchParams.get('rules'));
 	$('#seed').val(loadSearchParams.get('seed'));
 	$('#randomize')[0].checked = false;
+	$('#seed').prop('disabled', false);
 } else {
 	window.history.replaceState(null, null, window.location.origin + window.location.pathname);
 }
@@ -372,6 +373,10 @@ function parseTextArea() {
 }
 
 $('#parseButton').on('click', parseTextArea);
+
+$('#randomize').click(function() {
+	$(this).is(':checked') ? $('#seed').prop('disabled', true) : $('#seed').prop('disabled', false);
+});
 
 function saveRules() {
 	if (!document.getElementById('seed').value) return;
