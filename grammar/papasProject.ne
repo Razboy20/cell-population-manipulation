@@ -17,7 +17,7 @@ function -> f_leader {% id %}
 		| f_select {% id %}
 		
 f_leader -> "leader_elect"i "(" _ (setp):? _ ")" {% function(d) {return {type: "f-leaderelect", group: (d[3]) ? d[3][0] : null}} %}
-		| "place_leader"i "(" _ int _ "," _ int _ ")" {% function(d) {return {type: "f-leaderelect", group: d[3]}} %}
+		| "place_leader"i "(" _ int _ "," _ int _ ")" {% function(d) {return {type: "f-placeleader", coords: {x: d[3], y: d[7]}}} %}
 
 f_select -> "select"i "(" (_ var _ ","):? _ conds _ ")" {% function(d) {return {type: "f-select", group: (d[2]) ? d[2][2] : null, conds: d[4]}} %}
 

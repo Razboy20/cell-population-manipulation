@@ -132,7 +132,7 @@ var grammar = {
     {"name": "f_leader$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "f_leader", "symbols": ["f_leader$subexpression$1", {"literal":"("}, "_", "f_leader$ebnf$1", "_", {"literal":")"}], "postprocess": function(d) {return {type: "f-leaderelect", group: (d[3]) ? d[3][0] : null}}},
     {"name": "f_leader$subexpression$2", "symbols": [/[pP]/, /[lL]/, /[aA]/, /[cC]/, /[eE]/, {"literal":"_"}, /[lL]/, /[eE]/, /[aA]/, /[dD]/, /[eE]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
-    {"name": "f_leader", "symbols": ["f_leader$subexpression$2", {"literal":"("}, "_", "int", "_", {"literal":","}, "_", "int", "_", {"literal":")"}], "postprocess": function(d) {return {type: "f-leaderelect", group: d[3]}}},
+    {"name": "f_leader", "symbols": ["f_leader$subexpression$2", {"literal":"("}, "_", "int", "_", {"literal":","}, "_", "int", "_", {"literal":")"}], "postprocess": function(d) {return {type: "f-placeleader", coords: {x: d[3], y: d[7]}}}},
     {"name": "f_select$subexpression$1", "symbols": [/[sS]/, /[eE]/, /[lL]/, /[eE]/, /[cC]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "f_select$ebnf$1$subexpression$1", "symbols": ["_", "var", "_", {"literal":","}]},
     {"name": "f_select$ebnf$1", "symbols": ["f_select$ebnf$1$subexpression$1"], "postprocess": id},

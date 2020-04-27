@@ -6,8 +6,7 @@ import './lib/simplemodeaddon.js';
 import './lib/seedrandom.js';
 import './lib/jquery.toast.js';
 // ^ The current program & seed URL has been saved to clipboard.
-let vars;
-let cells;
+let vars, cells, mainVar;
 let seed = 'Yet to be created...';
 $('#seed').attr('placeholder', seed);
 
@@ -33,8 +32,8 @@ function lexer(parse) {
     let mainIncrement = 0;
     let boardSize = null;
     cells = [];
+    mainVar = undefined;
     let lastError = { error: '' };
-    //console.log(parser);
     parse.forEach((line, _lineNum) => {
         const lineNum = _lineNum + 1;
         if (line === null) return null;
@@ -46,7 +45,6 @@ function lexer(parse) {
                     break;
                 }
                 boardSize = line.size === 'default' ? { x: 150, y: 150 } : line.size;
-                //console.log(boardSize);
                 const _cells = [];
                 for (let i = 0; i < boardSize.x; i++) {
                     const _temp = [];
@@ -57,22 +55,13 @@ function lexer(parse) {
                     cells.push(_temp);
                 }
                 vars.set(line.var, { type: 'main', class: 'group', cells: _cells });
-                vars.set('mainvar', line.var);
+                mainVar = line.var;
                 mainIncrement++;
                 break;
             case 'f-leaderelect':
-                if (!line.group) line.group = vars.get('main');
+                if (!line.group) line.group = mainVar;
                 const cellGroup = setoperations(line.group, { lastError, lineNum });
-                //console.log(cellGroup);
-                /*const varGroup = vars.get(line.group);
-					if (!varGroup) {
-						console.error("Group variable does not exist.");
-						break;
-					} else if (varGroup.class != "group") {
-						console.error("Variable is not of type group.");
-						break;
-					}*/
-                //const cell = cellGroup[Math.floor(Math.random() * boardSize.x)][Math.floor(Math.random() * boardSize.y)];
+
                 if (cellGroup.length === 0) {
                     lastError.warn = `Line ${lineNum}: Cell Population calling leader_election is empty! (Might be a one time thing, or if it is recurring, double check your work.)`;
                     break;
@@ -82,22 +71,25 @@ function lexer(parse) {
                 for (let i = 0; i < 15; i++) {
                     const randomNum = Math.floor(Math.random() * cellGroup.length);
                     const [ i1, i2 ] = cellGroup[randomNum];
-                    // cellGroup.splice(randomNum, 1);
                     const _cell = cells[i1][i2];
                     if (typeof _cell.type != 'undefined') continue;
                     cell = _cell;
                     break;
                 }
-                // const randomNum = Math.floor(Math.random() * cellGroup.length);
-                // const [ i1, i2 ] = cellGroup[randomNum];
-                // // cellGroup.splice(randomNum, 1);
-                // cell = cells[i1][i2];
                 if (!cell) break;
                 cell.type = 'leader';
-                cell.color = '#' + Math.random().toString(16).slice(2, 8);
+                cell.color = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
                 vars.set(line.setvar, { type: 'leader', class: 'cell', cell: [ cell.pos.x, cell.pos.y ] });
                 break;
+            case 'f-placeleader':
+                let pcell;
+                pcell = cells[boardSize.x / 2 + line.coords.x][boardSize.y / 2 + line.coords.y];
+                pcell.type = 'leader';
+                pcell.color = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
+                vars.set(line.setvar, { type: 'leader', class: 'cell', cell: [ pcell.pos.x, pcell.pos.y ] });
+                break;
             case 'f-select':
+                if (!line.group) line.group = mainVar;
                 const selectGroup = vars.get(line.group);
                 if (!selectGroup) {
                     lastError.error = `Line ${lineNum}: Group variable does not exist.`;
@@ -110,7 +102,7 @@ function lexer(parse) {
                 selectGroup.cells.forEach((cell) => {
                     if (conditions(line.conds, cell, { lastError, lineNum })) _temp.push(cell);
                 });
-                const _color1 = '#' + Math.random().toString(16).slice(2, 8);
+                const _color1 = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
                 _temp.forEach(([ i1, i2 ]) => {
                     const cell = cells[i1][i2];
                     if (!cell.type) cell.color = _color1;
@@ -120,7 +112,7 @@ function lexer(parse) {
                 break;
             case 'f-set_operation':
                 const _scells = setoperations(line.ops, { lastError, lineNum });
-                const _color2 = '#' + Math.random().toString(16).slice(2, 8);
+                const _color2 = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
                 _scells.forEach(([ i1, i2 ]) => {
                     const cell = cells[i1][i2];
                     if (!cell.type) cell.color = _color2;
@@ -385,7 +377,7 @@ function showError() {
 
 function parseTextArea() {
     $('#parseButton').prop('disabled', true);
-    const toParse = rulesEditor.getValue();
+    const toParse = rulesEditor.getValue().replace(/\/\/.*/g, '');
     const Parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
     try {
         Parser.feed(toParse);
