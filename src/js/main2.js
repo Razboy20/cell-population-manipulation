@@ -4,7 +4,8 @@ import './lib/jcanvas.js';
 import './lib/codemirror.js';
 import './lib/simplemodeaddon.js';
 import './lib/seedrandom.js';
-
+import './lib/jquery.toast.js';
+// ^ The current program & seed URL has been saved to clipboard.
 let vars;
 let cells;
 let seed = 'Yet to be created...';
@@ -32,14 +33,16 @@ function lexer(parse) {
 	let mainIncrement = 0;
 	let boardSize = null;
 	cells = [];
+	let lastError = { error: '' };
 	//console.log(parser);
-	parse.forEach((line) => {
+	parse.forEach((line, _lineNum) => {
+		const lineNum = _lineNum + 1;
 		if (line === null) return null;
 		if (typeof line.type == 'undefined') return;
 		switch (line.type) {
 			case 'f-main':
 				if (mainIncrement > 0) {
-					console.error('You cannot re-create the main board twice!');
+					lastError.error = `Line ${lineNum}: You cannot re-create the main board twice!`;
 					break;
 				}
 				boardSize = line.size === 'default' ? { x: 150, y: 150 } : line.size;
@@ -57,7 +60,7 @@ function lexer(parse) {
 				mainIncrement++;
 				break;
 			case 'f-leaderelect':
-				const cellGroup = setoperations(line.group);
+				const cellGroup = setoperations(line.group, { lastError, lineNum });
 				//console.log(cellGroup);
 				/*const varGroup = vars.get(line.group);
 					if (!varGroup) {
@@ -69,9 +72,7 @@ function lexer(parse) {
 					}*/
 				//const cell = cellGroup[Math.floor(Math.random() * boardSize.x)][Math.floor(Math.random() * boardSize.y)];
 				if (cellGroup.length === 0) {
-					console.error(
-						'Cell Population calling leader_election is empty! (Might be a one time thing, or if it is recurring, double check your work.)'
-					);
+					lastError.warn = `Line ${lineNum}: Cell Population calling leader_election is empty! (Might be a one time thing, or if it is recurring, double check your work.)`;
 					break;
 				}
 
@@ -97,15 +98,15 @@ function lexer(parse) {
 			case 'f-select':
 				const selectGroup = vars.get(line.group);
 				if (!selectGroup) {
-					console.error('Group variable does not exist.');
+					lastError.error = `Line ${lineNum}: Group variable does not exist.`;
 					break;
 				} else if (selectGroup.class !== 'group') {
-					console.error('Variable is not of type group.');
+					lastError.error = `Line ${lineNum}: Variable is not of type group.`;
 					break;
 				}
 				const _temp = [];
 				selectGroup.cells.forEach((cell) => {
-					if (conditions(line.conds, cell)) _temp.push(cell);
+					if (conditions(line.conds, cell, { lastError, lineNum })) _temp.push(cell);
 				});
 				const _color1 = '#' + Math.random().toString(16).slice(2, 8);
 				_temp.forEach(([ i1, i2 ]) => {
@@ -116,7 +117,7 @@ function lexer(parse) {
 				vars.set(line.setvar, { type: 'population', class: 'group', cells: _temp });
 				break;
 			case 'f-set_operation':
-				const _scells = setoperations(line.ops);
+				const _scells = setoperations(line.ops, { lastError, lineNum });
 				const _color2 = '#' + Math.random().toString(16).slice(2, 8);
 				_scells.forEach(([ i1, i2 ]) => {
 					const cell = cells[i1][i2];
@@ -128,15 +129,38 @@ function lexer(parse) {
 				break;
 		}
 	});
+
+	if (lastError.warn) {
+		$.toast({
+			text: lastError.warn,
+			showHideTransition: 'slide',
+			heading: 'Potential Error:',
+			icon: 'warning',
+			position: 'bottom-right',
+			hideAfter: 3000,
+			stack: 5
+		});
+	} else if (lastError.error) {
+		$.toast({
+			text: lastError.error,
+			showHideTransition: 'slide',
+			heading: 'Error:',
+			icon: 'error',
+			position: 'bottom-right',
+			hideAfter: 5000,
+			stack: 5
+		});
+	}
+
 	return { cells: cells, boardSize: boardSize };
 }
 
-function conditions(conds, cell) {
+function conditions(conds, cell, { lastError, lineNum }) {
 	if (!vars.has(conds.left) && isNaN(conds.left) && typeof conds.left != 'object') {
-		console.error(conds.left + ' -- Left leader cell does not exist.');
+		lastError.error = `Line ${lineNum}: Left leader cell '${conds.left}' does not exist.`;
 		return null;
 	} else if (!vars.has(conds.right) && isNaN(conds.right) && typeof conds.left != 'object') {
-		console.error(conds.right + ' -- Right leader cell does not exist.');
+		lastError.error = `Line ${lineNum}: Right leader cell '${conds.right}' does not exist.`;
 		return null;
 	}
 	switch (conds.type) {
@@ -154,11 +178,17 @@ function conditions(conds, cell) {
 		case '<=':
 			return dist(conds.left, cell) <= dist(conds.right, cell);
 		case 'not':
-			return !conditions(conds.val, cell);
+			return !conditions(conds.val, cell, { lastError, lineNum });
 		case 'and':
-			return conditions(conds.left, cell) && conditions(conds.right, cell);
+			return (
+				conditions(conds.left, cell, { lastError, lineNum }) &&
+				conditions(conds.right, cell, { lastError, lineNum })
+			);
 		case 'or':
-			return conditions(conds.left, cell) || conditions(conds.right, cell);
+			return (
+				conditions(conds.left, cell, { lastError, lineNum }) ||
+				conditions(conds.right, cell, { lastError, lineNum })
+			);
 	}
 }
 
@@ -166,16 +196,15 @@ function conditions(conds, cell) {
  * Returns cells that satisfy the conditions
  * @param {Object} ops Set operations to be used on groups.
  */
-function setoperations(ops) {
+function setoperations(ops, { lastError, lineNum }) {
 	if (typeof ops == 'string') {
 		//console.log("String: " + ops);
 		const group = vars.get(ops);
 		if (!group) {
-			console.error('Group variable does not exist.');
-			console.log(ops);
+			lastError.error = `Line ${lineNum}: Group variable does not exist.`;
 			return [];
 		} else if (group.class !== 'group') {
-			console.error('Variable is not of type group.');
+			lastError.error = `Line ${lineNum}: Variable is not of type group.`;
 			return [];
 		}
 
@@ -186,30 +215,30 @@ function setoperations(ops) {
 	if (typeof ops.left == 'string') {
 		const lvar = vars.get(ops.left);
 		if (!lvar) {
-			console.error('Left group variable does not exist.');
+			lastError.error = `Line ${lineNum}: Left group variable does not exist.`;
 			return [];
 		} else if (lvar.class !== 'group') {
-			console.error('Variable is not of type group.');
+			lastError.error = `Line ${lineNum}: Left variable is not of type group.`;
 			return [];
 		}
 		lgroup = lvar.cells;
 	} else {
-		lgroup = setoperations(ops.left);
+		lgroup = setoperations(ops.left, { lastError, lineNum });
 	}
 
 	let rgroup;
 	if (typeof ops.right == 'string') {
 		const rvar = vars.get(ops.right);
 		if (!rvar) {
-			console.error('Right group variable does not exist.');
+			lastError.error = `Line ${lineNum}: Right group variable does not exist.`;
 			return [];
 		} else if (rvar.class !== 'group') {
-			console.error('Variable is not of type group.');
+			lastError.error = `Line ${lineNum}: Right variable is not of type group.`;
 			return [];
 		}
 		rgroup = rvar.cells;
 	} else {
-		rgroup = setoperations(ops.right);
+		rgroup = setoperations(ops.right, { lastError, lineNum });
 	}
 
 	switch (ops.type) {
@@ -276,7 +305,6 @@ function render({ boardSize, cells }) {
 		group.forEach((cell) => {
 			if (!cell.color) return;
 			ctx.fillStyle = cell.color;
-			console.log(cell.color, ctx.fillStyle);
 			ctx.beginPath();
 			ctx.arc(cell.pos.x * ratio + ratio / 2, cell.pos.y * ratio + ratio / 2, ratio / 2, 0, 2 * Math.PI);
 			ctx.fill();
@@ -366,10 +394,18 @@ function parseTextArea() {
 	} catch (error) {
 		showError();
 		console.error(error);
+		$.toast({
+			text: 'There was an error in parsing your code. Double check that everything is correct.',
+			position: 'bottom-right',
+			showHideTransition: 'slide',
+			heading: 'Parsing error:',
+			icon: 'error',
+			hideAfter: 7000
+		});
 	}
 	setTimeout(() => {
 		$('#parseButton').prop('disabled', false);
-	}, 500);
+	}, 300);
 }
 
 $('#parseButton').on('click', parseTextArea);
@@ -377,6 +413,24 @@ $('#parseButton').on('click', parseTextArea);
 $('#randomize').click(function() {
 	$(this).is(':checked') ? $('#seed').prop('disabled', true) : $('#seed').prop('disabled', false);
 });
+
+// code from https://hackernoon.com/copying-text-to-clipboard-with-javascript-df4d4988697f
+const copyToClipboard = (str) => {
+	const el = document.createElement('textarea');
+	el.value = str;
+	el.setAttribute('readonly', '');
+	el.style.position = 'absolute';
+	el.style.left = '-9999px';
+	document.body.appendChild(el);
+	const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+	el.select();
+	document.execCommand('copy');
+	document.body.removeChild(el);
+	if (selected) {
+		document.getSelection().removeAllRanges();
+		document.getSelection().addRange(selected);
+	}
+};
 
 function saveRules() {
 	if (!document.getElementById('seed').value) return;
@@ -389,6 +443,24 @@ function saveRules() {
 		null,
 		window.location.origin + window.location.pathname + '?' + searchParams.toString()
 	);
+	copyToClipboard(location.href);
+
+	$('#randomize')[0].checked = false;
+	$('#seed').prop('disabled', false);
+	$.toast({
+		heading: '^ URL copied to clipboard.',
+
+		showHideTransition: 'slide',
+		position: 'top-center',
+
+		bgColor: '#4e4e4e',
+		textColor: '#eeeeee',
+		textAlign: 'center',
+		stack: false,
+		afterHidden: function() {
+			$.toast().reset('all');
+		}
+	});
 }
 
 $('#saveRules').on('click', saveRules);
