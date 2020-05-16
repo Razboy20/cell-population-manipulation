@@ -20,13 +20,13 @@
 <body>
     <section class="grid">
         <div class="input">
-            <label for="rules"></label><textarea name="rules" id="rules" cols="30" rows="50" style="display: none;">main(X);
-a1 = leader_elect(X);
-a2 = leader_elect(X);
-line1 = select(X, a1 == a2);
+            <label for="rules"></label><textarea name="rules" id="rules" cols="30" rows="50" style="display: none;">main(X); // initializes the board as variable X
+a1 = leader_elect(); // elects a leader from the board
+a2 = leader_elect(X); // or, you can reference X as the board
+line1 = select(a1 == a2);
 b1 = leader_elect(line1);
 b2 = leader_elect(line1);
-line2 = select(X, b1 == b2);
+line2 = select(X, b1 == b2); // same with select, you can reference the population or not.
 
 center = leader_elect(line1 intersect line2);
 circle = select(X, center == 40);
@@ -36,10 +36,12 @@ p2 = leader_elect(circle intersect line1);
 p3 = leader_elect(circle intersect line2);
 p4 = leader_elect(circle intersect line2);
 
-square = select(X, p1 > center and p2 > center and p3 > center and p4 > center);
+square = select(p1 < center and p2 < center and p3 < center and p4 < center);
 </textarea><br>
             <button id="parseButton" type="submit">REPOPULATE</button><br>
-            <div class="seed"><span></span><input type="text" name="seed" id="seed" autocomplete="off" disabled><input type="checkbox" name="randomize" id="randomize" value="Randomize" checked><label for="randomize">Randomize</label><button id="saveRules">SAVE</button></div>
+            <div class="seed"><span></span><input type="text" name="seed" id="seed" autocomplete="off" disabled><input
+                    type="checkbox" name="randomize" id="randomize" value="Randomize" checked><label
+                    for="randomize">Randomize</label><button id="saveRules">SAVE</button></div>
 
         </div>
         <div class="output">

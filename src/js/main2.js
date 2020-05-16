@@ -163,13 +163,13 @@ function conditions(conds, cell, { lastError, lineNum }) {
                 Math.abs(dist(conds.left, cell) - dist(conds.right, cell)) <=
                 Math.sqrt(dist(conds.left, conds.right, true)) * 1.1
             );
-        case '>':
-            return dist(conds.left, cell) > dist(conds.right, cell);
         case '<':
+            return dist(conds.left, cell) > dist(conds.right, cell);
+        case '>':
             return dist(conds.left, cell) < dist(conds.right, cell);
-        case '>=':
-            return dist(conds.left, cell) >= dist(conds.right, cell);
         case '<=':
+            return dist(conds.left, cell) >= dist(conds.right, cell);
+        case '>=':
             return dist(conds.left, cell) <= dist(conds.right, cell);
         case 'not':
             return !conditions(conds.val, cell, { lastError, lineNum });
@@ -349,7 +349,7 @@ CodeMirror.defineSimpleMode('formatrules', {
             next: 'setops'
         },
         {
-            regex: /(?:==|-|><=|>|>=)/,
+            regex: /(?:==|-|<|<=|>|>=)/,
             token: 'atom'
         },
         {
