@@ -19,6 +19,13 @@ body {
 			margin-top: 17px;
 			position: relative;
 			width: fit-content;
+			align-items: center;
+			text-align: center;
+			* {
+				margin-right: 3px;
+				margin-bottom: 10px;
+				margin-left: 3px;
+			}
 		}
 		label {
 			font-size: 13px;

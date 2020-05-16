@@ -29,6 +29,16 @@ body {
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: center;
+}
+
+.grid .input .seed * {
+  margin-right: 3px;
+  margin-bottom: 10px;
+  margin-left: 3px;
 }
 
 .grid .input label {

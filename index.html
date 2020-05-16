@@ -39,9 +39,16 @@ p4 = leader_elect(circle intersect line2);
 square = select(p1 < center and p2 < center and p3 < center and p4 < center);
 </textarea><br>
             <button id="parseButton" type="submit">REPOPULATE</button><br>
-            <div class="seed"><span></span><input type="text" name="seed" id="seed" autocomplete="off" disabled><input
-                    type="checkbox" name="randomize" id="randomize" value="Randomize" checked><label
-                    for="randomize">Randomize</label><button id="saveRules">SAVE</button></div>
+            <div class="seed">
+                <input type="text" name="seed" id="seed" autocomplete="off" disabled><input type="checkbox"
+                    name="randomize" id="randomize" value="Randomize" checked><label
+                    for="randomize">Randomize</label><button id="saveRules">SAVE</button><br>
+                <label for="diffusionType">Diffusion Type: </label><select name="diffusionType" id="diffusionType">
+                    <option value="default">Straight Lines (default)</option>
+                    <option value="linear">1/distance, Linear Comparison</option>
+                    <option value="ratio">1/distance, Ratio Comparison</option>
+                </select>
+            </div>
 
         </div>
         <div class="output">
