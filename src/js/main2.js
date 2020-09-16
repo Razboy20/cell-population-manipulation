@@ -90,14 +90,18 @@ function lexer(parse) {
 				}
 				if (!cell) break;
 				cell.type = 'leader';
-				cell.color = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
+				cell.color = line.color
+					? line.color.length != 9 ? line.color : `${cell.color} ${line.color}`
+					: '#' + Math.random().toString(16).slice(2, 8);
 				vars.set(line.setvar, { type: 'leader', class: 'cell', cell: [ cell.pos.x, cell.pos.y ] });
 				break;
 			case 'f-placeleader':
 				let pcell;
 				pcell = cells[boardSize.x / 2 + line.coords.x][boardSize.y / 2 + line.coords.y];
 				pcell.type = 'leader';
-				pcell.color = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
+				pcell.color = line.color
+					? line.color.length != 9 ? line.color : `${pcell.color} ${line.color}`
+					: '#' + Math.random().toString(16).slice(2, 8);
 				vars.set(line.setvar, { type: 'leader', class: 'cell', cell: [ pcell.pos.x, pcell.pos.y ] });
 				break;
 			case 'f-select':
@@ -117,7 +121,7 @@ function lexer(parse) {
 				const _color1 = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
 				_temp.forEach(([ i1, i2 ]) => {
 					const cell = cells[i1][i2];
-					if (!cell.type) cell.color = _color1;
+					if (!cell.type) cell.color = _color1.length != 9 ? _color1 : `${cell.color} ${_color1}`;
 				});
 
 				vars.set(line.setvar, { type: 'population', class: 'group', cells: _temp });
@@ -127,7 +131,7 @@ function lexer(parse) {
 				const _color2 = line.color ? line.color : '#' + Math.random().toString(16).slice(2, 8);
 				_scells.forEach(([ i1, i2 ]) => {
 					const cell = cells[i1][i2];
-					if (!cell.type) cell.color = _color2;
+					if (!cell.type) cell.color = _color2.length != 9 ? _color2 : `${cell.color} ${_color2}`;
 				});
 				vars.set(line.setvar, { type: 'population', class: 'group', cells: _scells });
 				break;
@@ -424,15 +428,26 @@ function render({ boardSize, cells }) {
 	const canvas = document.getElementById('cellBoard');
 	const ctx = canvas.getContext('2d');
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.globalCompositeOperation = 'source-over';
 	const ratio = boardSize.x > boardSize.y ? 1000 / boardSize.x : 1000 / boardSize.y;
 
 	cells.forEach((group) => {
 		group.forEach((cell) => {
 			if (!cell.color) return;
-			ctx.fillStyle = cell.color;
-			ctx.beginPath();
-			ctx.arc(cell.pos.x * ratio + ratio / 2, cell.pos.y * ratio + ratio / 2, ratio / 2, 0, 2 * Math.PI);
-			ctx.fill();
+			cell.color = cell.color.replace('undefined ', '');
+			if (cell.color.split(' ').length == 1) {
+				ctx.fillStyle = cell.color;
+				ctx.beginPath();
+				ctx.arc(cell.pos.x * ratio + ratio / 2, cell.pos.y * ratio + ratio / 2, ratio / 2, 0, 2 * Math.PI);
+				ctx.fill();
+			} else {
+				cell.color.split(' ').forEach((color) => {
+					ctx.fillStyle = color;
+					ctx.beginPath();
+					ctx.arc(cell.pos.x * ratio + ratio / 2, cell.pos.y * ratio + ratio / 2, ratio / 2, 0, 2 * Math.PI);
+					ctx.fill();
+				});
+			}
 		});
 	});
 }

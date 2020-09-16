@@ -177,6 +177,7 @@ var grammar = {
     {"name": "setops$subexpression$3$subexpression$2", "symbols": [/[mM]/, /[iI]/, /[nN]/, /[uU]/, /[sS]/], "postprocess": function(d) {return d.join(""); }},
     {"name": "setops$subexpression$3", "symbols": ["setops$subexpression$3$subexpression$2"]},
     {"name": "setops", "symbols": ["setp", "_", "setops$subexpression$3", "_", "setp"], "postprocess": function(d) {return {type: "difference", left: d[0], right: d[4]}}},
+    {"name": "color", "symbols": [{"literal":"#"}, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/], "postprocess": function(d) {return d.join("")}},
     {"name": "color", "symbols": [{"literal":"#"}, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/], "postprocess": function(d) {return d.join("")}},
     {"name": "color", "symbols": [{"literal":"#"}, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/, /[A-Fa-f0-9]/], "postprocess": function(d) {return d.join("")}},
     {"name": "color", "symbols": [], "postprocess": id},

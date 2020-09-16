@@ -57,7 +57,8 @@ setops -> setp __ ("union"i | "join"i) __ setp {% function(d) {return {type: "un
 
 # --- static ---
 
-color -> "#" [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] {% function(d) {return d.join("")} %}
+color ->  "#" [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] {% function(d) {return d.join("")} %}
+		| "#" [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] {% function(d) {return d.join("")} %}
 		| "#" [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] {% function(d) {return d.join("")} %}
 		| null {% id %}
 
