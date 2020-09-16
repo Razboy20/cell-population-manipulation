@@ -1,4 +1,4 @@
-// Generated automatically by nearley, version 2.19.2
+// Generated automatically by nearley, version 2.19.1
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
@@ -137,7 +137,7 @@ var grammar = {
     {"name": "f_select$ebnf$1$subexpression$1", "symbols": ["_", "var", "_", {"literal":","}]},
     {"name": "f_select$ebnf$1", "symbols": ["f_select$ebnf$1$subexpression$1"], "postprocess": id},
     {"name": "f_select$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "f_select", "symbols": ["f_select$subexpression$1", {"literal":"("}, "f_select$ebnf$1", "_", "conds", "_", {"literal":")"}], "postprocess": function(d) {return {type: "f-select", group: (d[2]) ? d[2][2] : null, conds: d[4]}}},
+    {"name": "f_select", "symbols": ["f_select$subexpression$1", {"literal":"("}, "f_select$ebnf$1", "_", "conds", "_", {"literal":")"}], "postprocess": function(d) {return {type: "f-select", group: (d[2]) ? d[2][1] : null, conds: d[4]}}},
     {"name": "conds", "symbols": ["or"], "postprocess": id},
     {"name": "p", "symbols": [{"literal":"("}, "_", "or", "_", {"literal":")"}], "postprocess": function(d) {return d[2]}},
     {"name": "or$subexpression$1", "symbols": [/[oO]/, /[rR]/], "postprocess": function(d) {return d.join(""); }},
@@ -182,6 +182,7 @@ var grammar = {
     {"name": "color", "symbols": [], "postprocess": id},
     {"name": "condvar", "symbols": ["not"], "postprocess": id},
     {"name": "condvar", "symbols": ["var"], "postprocess": id},
+    {"name": "condvar", "symbols": ["decimal"], "postprocess": id},
     {"name": "var$ebnf$1", "symbols": [/[\w]/]},
     {"name": "var$ebnf$1", "symbols": ["var$ebnf$1", /[\w]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "var", "symbols": ["var$ebnf$1"], "postprocess": function(d) {return d[0].join("")}},

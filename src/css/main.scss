@@ -1,9 +1,22 @@
-@import url("fonts/Roboto/Roboto-Regular.ttf");
+// @import url("fonts/Roboto/Roboto-Regular.ttf");
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 body {
 	margin: unset;
 	font-family: 'Roboto', sans-serif;
 }
+
+.footer {
+	position: fixed;
+	bottom: 20px;
+	text-align: center;
+	width: 100vw;
+	color: rgb(80, 80, 80);
+	a {
+		color: dodgerblue;
+	}
+}
+
 .grid {
 	display: grid;
 	grid-template-columns: 30vw 70vw;
@@ -11,8 +24,25 @@ body {
 	grid-template-rows: minmax(0%, 100vh);
 	align-items: center;
 	justify-items: center;
+
 	.input {
 		max-width: 90%;
+
+		.aboveInput {
+			display: block;
+			margin: auto;
+			margin-bottom: 17px;
+			position: relative;
+			width: fit-content;
+			align-items: center;
+			text-align: center;
+			* {
+				margin-right: 3px;
+				margin-bottom: 10px;
+				margin-left: 3px;
+			}
+		}
+
 		.seed {
 			display: block;
 			margin: auto;
@@ -29,7 +59,7 @@ body {
 		}
 		label {
 			font-size: 13px;
-			font-family: inherit;
+			font-family: 'Roboto';
 		}
 		#parseButton {
 			margin: auto;

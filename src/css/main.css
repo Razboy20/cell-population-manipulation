@@ -1,7 +1,19 @@
-@import url("fonts/Roboto/Roboto-Regular.ttf");
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 body {
   margin: unset;
   font-family: 'Roboto', sans-serif;
+}
+
+.footer {
+  position: fixed;
+  bottom: 20px;
+  text-align: center;
+  width: 100vw;
+  color: #505050;
+}
+
+.footer a {
+  color: dodgerblue;
 }
 
 .grid {
@@ -19,6 +31,26 @@ body {
 
 .grid .input {
   max-width: 90%;
+}
+
+.grid .input .aboveInput {
+  display: block;
+  margin: auto;
+  margin-bottom: 17px;
+  position: relative;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: center;
+}
+
+.grid .input .aboveInput * {
+  margin-right: 3px;
+  margin-bottom: 10px;
+  margin-left: 3px;
 }
 
 .grid .input .seed {
@@ -43,7 +75,7 @@ body {
 
 .grid .input label {
   font-size: 13px;
-  font-family: inherit;
+  font-family: 'Roboto';
 }
 
 .grid .input #parseButton {
